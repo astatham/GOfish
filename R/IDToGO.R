@@ -1,10 +1,15 @@
-IDToGO <-function(ids, universe=NULL, ontology=c("BP", "MF", "CC"), ID=c("entrez", "genbank", "alias", "ensembl", "symbol", "genename", "unigene"), speciesdb=c("org.Mm.eg.db", "org.Hs.eg.db"), n=NULL, p.adj=p.adjust.methods, p.cutoff=0.05, orderBy=c("classic", "elim", "parentchild")) {
+IDToGO <-function(ids, universe=NULL, ontology=c("BP", "MF", "CC"), ID=c("entrez", "genbank", "alias", "ensembl", "symbol", "genename", "unigene"), speciesdb=c("org.Mm.eg.db", "org.Hs.eg.db"), n=NULL, p.adj=NULL, p.cutoff=0.05, orderBy=c("classic", "elim", "parentchild"), tests=NULL) {
 
     ontology <- match.arg(ontology)
     ID <- match.arg(ID)
     speciesdb <- match.arg(speciesdb)
-    p.adj <- match.arg(p.adj)
     orderBy <- match.arg(orderBy)
+    tests <- unique(c(orderBy, tests))
+    names(tests) <- tests
+    if (any(!tests %in% c("classic", "elim", "parentchild")))
+        stop("One or more of ", paste(tests, collapse=" "), "not recognised - must be classic, elim or parentchild")
+    if (!is.null(p.adj)) if (!p.adj %in% p.adjust.methods)
+        stop("If p.adj is specified, it must be one of p.adjust.methods")
 
     ID2GO <- annFUN.org(ontology, feasibleGenes=universe, speciesdb, ID=ID)
     IDnames <- names(inverseList(ID2GO))
@@ -13,23 +18,19 @@ IDToGO <-function(ids, universe=NULL, ontology=c("BP", "MF", "CC"), ID=c("entrez
     names(genelist) <- IDnames
 
     GOdata <- new("topGOdata", ontology=ontology, allGenes=genelist, annot=annFUN.GO2genes, GO2genes=ID2GO, description="Genes")
-    GOtest <- list("classic"=runTest(GOdata, algorithm="classic", statistic="fisher"),
-                      "elim"=runTest(GOdata, algorithm="elim", statistic="fisher"),
-               "parentchild"=runTest(GOdata, algorithm="parentchild", statistic="fisher"))
-    if (is.null(n)) { #use pvalue cutoff
-        p <- topGO::score(GOtest[[orderBy]])
-        p <- p.adjust(p, p.adj)
 
-        #No significant terms
-        if (sum(p<p.cutoff)==0) return(data.frame())
+    GOtest <- lapply(tests, function(x) runTest(GOdata, algorithm=x, statistic="fisher"))
 
-        tmp <- GenTable(GOdata, classic=GOtest[[1]], elim=GOtest[[2]],  parentchild=GOtest[[3]], topNodes=sum(p<p.cutoff))
-        tmp <- tmp[order(tmp[[orderBy]]),]
-        tmp[[paste(orderBy, "adj")]] <- p[tmp$GO.ID]
-        return(tmp)
-    } else { #return set number of terms
-        if (n==0) n <- length(topGO::score(GOtest[[orderBy]])) #return ALL terms
-        return(GenTable(GOdata, classic=GOtest[[1]], elim=GOtest[[2]], parentchild=GOtest[[3]], orderBy=orderBy, topNodes=n))
-    }
+    #gimme some pvalue lovin
+    p <- topGO::score(GOtest[[orderBy]])
+    if (!is.null(p.adj)) p <- p.adjust(p, p.adj) #we want to adjust dat bad boi
+
+    if (is.null(n)) { #determine n from the pvalue cutoff
+        if (sum(p<p.cutoff)==0) return(data.frame()) else n <- sum(p<p.cutoff)
+    } else if (n==0) n <- length(topGO::score(GOtest[[orderBy]])) #return ALL terms
+
+    tmp <- do.call(GenTable, c(object=GOdata, GOtest, orderBy=orderBy, topNodes=n))
+    if (!is.null(p.adj)) tmp[[paste(orderBy, "adj")]] <- p[tmp$GO.ID] #tack on the adjusted
+    return(tmp)
 }
 

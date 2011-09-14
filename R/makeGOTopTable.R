@@ -1,5 +1,5 @@
 makeGOTopTable <- function(ids, outfile="topGOout.tex", main="Significant GO Terms", ...) {
-    resTable <- IDToGO(ids, ...)[,-6]
+    resTable <- IDToGO(ids, ...)
     writeLines(c("\\documentclass[a4paper,12pt]{article}",
                  "\\usepackage[landscape]{geometry}",
                  "\\usepackage{fullpage}",
@@ -10,6 +10,7 @@ makeGOTopTable <- function(ids, outfile="topGOout.tex", main="Significant GO Ter
     f1 <- file(outfile, open="at")
     writeLines("\\end{document}", con=f1)
     close(f1)
-    tools::texi2dvi(outfile, pdf=TRUE)
+    tools::texi2dvi(outfile, pdf=TRUE, clean=TRUE)
+    invisible(resTable)
 }
 

@@ -1,7 +1,7 @@
 Package: GOfish
 Type: Package
 Title: Fishiing for GO terms? SO ARE WE!
-Version: 1.3
+Version: 1.4
 Date: 2011-09-14
 Author: Hugh French, Aaron Statham
 Maintainer: Hugh French <hughjohnfrench@gmail.com>
