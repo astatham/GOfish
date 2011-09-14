@@ -1,0 +1,13 @@
+Package: GOfish
+Type: Package
+Title: Fishiing for GO terms? SO ARE WE!
+Version: 1.3
+Date: 2011-09-14
+Author: Hugh French, Aaron Statham
+Maintainer: Hugh French <hughjohnfrench@gmail.com>
+Description: Takes gene identifiers and fishes for GO terms
+License: LGPL (>= 2)
+LazyLoad: yes
+Depends: xtable (>= 1.5), topGO (>= 2.4.0), GO.db (>= 2.5.0), GenomicRanges (>= 1.4.8), GenomicFeatures (>= 1.4.4)
+Suggests: org.Mm.eg.db (>= 2.4.1), org.Hs.eg.db (>= 2.5.0)
+
