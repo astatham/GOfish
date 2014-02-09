@@ -48,9 +48,9 @@ if (length(onto) != 1) {stop("ontology must be one of GO:BP GO:MF or GO:CC")}
 
 	# pvalue correction
     cat("\n p value adjust \n")
-	enriched<-as.integer(p.adjust(GO.both$over_represented_pvalue,method=p.adj)<.05)
+	enriched<-as.integer(p.adjust(GO.both$over_represented_pvalue,method=p.adj)< adj.p.val)
     enriched_adjusted<-p.adjust(GO.both$over_represented_pvalue,method=p.adj)
-	depleted<-as.integer(p.adjust(GO.both$under_represented_pvalue,method=p.adj)<.05)
+	depleted<-as.integer(p.adjust(GO.both$under_represented_pvalue,method=p.adj)< adj.p.val)
     depleted_adjusted<-p.adjust(GO.both$under_represented_pvalue,method=p.adj)
 	
 	significant.GO<-cbind(GO.both,"enriched"=enriched,"enriched_adjusted"=enriched_adjusted,"depleted"=depleted,"depleted_adjusted"=depleted_adjusted)
