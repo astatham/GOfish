@@ -44,7 +44,7 @@ if (length(onto) != 1) {stop("ontology must be one of GO:BP GO:MF or GO:CC")}
 
 	cat("go seq \n")
 
-	GO.both<-goseq(pwf_both,genome,ID,method="Sampling",test.cats=c(onto),repcnt=1000)
+	GO.both<-goseq(pwf_both,genome,ID,method="Sampling",test.cats=c(onto),repcnt=rep)
 
 	# pvalue correction
     cat("\n p value adjust \n")
