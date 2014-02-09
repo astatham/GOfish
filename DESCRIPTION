@@ -10,4 +10,3 @@ License: LGPL (>= 2)
 LazyLoad: yes
 Depends: xtable (>= 1.5), topGO (>= 2.4.0), GO.db (>= 2.5.0), GenomicRanges (>= 1.4.8), GenomicFeatures (>= 1.4.4), goseq (>= 1.15.2), BiasedUrn (>= 1.06.1), geneLenDataBase (>= 0.99.13)
 Suggests: org.Mm.eg.db (>= 2.4.1), org.Hs.eg.db (>= 2.5.0)
-
