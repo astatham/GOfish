@@ -1,6 +1,6 @@
-runGoSeq<-function(de.genes,all.genes,onto,genome,ID,rep=1000,p.adj="BH",adj.p.val=.05)
+runGoSeq<-function(de.genes,all.genes,onto,genome,ID,rep=1000,p.adj="BH",adj.p.val=.05,bias.data=NULL)
 {
-require(goseq)
+
 if (length(onto) != 1) {stop("ontology must be one of GO:BP GO:MF or GO:CC")} 
 	
 	    cat("filter for genes annotated to root.term \n")
@@ -13,7 +13,7 @@ if (length(onto) != 1) {stop("ontology must be one of GO:BP GO:MF or GO:CC")}
 	
 		cat(paste(onto,root.term,"\n"))
 	
-	out<-getgo(all.genes,genome,ID)
+  out<-getgo(all.genes,genome,ID)
 	#filter for genes not in db
 	out2 <- out[!is.na(names(out))]
 	#filter for genes not annotated to root.term
@@ -24,6 +24,10 @@ if (length(onto) != 1) {stop("ontology must be one of GO:BP GO:MF or GO:CC")}
 	#make a vector of 1 for DE 0 for not, names are genes.
 	assayed.genes<-names(out3)
 	#this is the background for gene ontology.
+
+  if(!is.null(bias.data)){
+    bias.data <- bias.data[assayed.genes]
+  }
 
 	both<-as.character(na.omit(assayed.genes[match(de.genes,assayed.genes)]))
 	#these are DE genes.
@@ -38,7 +42,7 @@ if (length(onto) != 1) {stop("ontology must be one of GO:BP GO:MF or GO:CC")}
 
 	pdf(file=paste(gsub("GO:","",onto),"pwf.pdf",sep=""))
 
-	pwf_both<-nullp(gene.vector.both,genome,ID)
+	pwf_both<-nullp(gene.vector.both,genome,ID,bias.data=bias.data)
 
 	dev.off()
 
